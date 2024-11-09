@@ -19,9 +19,9 @@ package metrics
 import (
 	"time"
 
+	opmetrics "github.com/awslabs/operatorpkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
-	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
 var (
@@ -29,35 +29,35 @@ var (
 	// number of reconciliations per controller. It has two labels. controller label refers
 	// to the controller name and result label refers to the reconcile result i.e
 	// success, error, requeue, requeue_after.
-	ReconcileTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	ReconcileTotal = opmetrics.NewPrometheusCounter(Registry, prometheus.CounterOpts{
 		Name: "controller_runtime_reconcile_total",
 		Help: "Total number of reconciliations per controller",
 	}, []string{"controller", "result"})
 
 	// ReconcileErrors is a prometheus counter metrics which holds the total
 	// number of errors from the Reconciler.
-	ReconcileErrors = prometheus.NewCounterVec(prometheus.CounterOpts{
+	ReconcileErrors = opmetrics.NewPrometheusCounter(Registry, prometheus.CounterOpts{
 		Name: "controller_runtime_reconcile_errors_total",
 		Help: "Total number of reconciliation errors per controller",
 	}, []string{"controller"})
 
 	// TerminalReconcileErrors is a prometheus counter metrics which holds the total
 	// number of terminal errors from the Reconciler.
-	TerminalReconcileErrors = prometheus.NewCounterVec(prometheus.CounterOpts{
+	TerminalReconcileErrors = opmetrics.NewPrometheusCounter(Registry, prometheus.CounterOpts{
 		Name: "controller_runtime_terminal_reconcile_errors_total",
 		Help: "Total number of terminal reconciliation errors per controller",
 	}, []string{"controller"})
 
 	// ReconcilePanics is a prometheus counter metrics which holds the total
 	// number of panics from the Reconciler.
-	ReconcilePanics = prometheus.NewCounterVec(prometheus.CounterOpts{
+	ReconcilePanics = opmetrics.NewPrometheusCounter(Registry, prometheus.CounterOpts{
 		Name: "controller_runtime_reconcile_panics_total",
 		Help: "Total number of reconciliation panics per controller",
 	}, []string{"controller"})
 
 	// ReconcileTime is a prometheus metric which keeps track of the duration
 	// of reconciliations.
-	ReconcileTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	ReconcileTime = opmetrics.NewPrometheusHistogram(Registry, prometheus.HistogramOpts{
 		Name: "controller_runtime_reconcile_time_seconds",
 		Help: "Length of time per reconciliation per controller",
 		Buckets: []float64{0.005, 0.01, 0.025, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
@@ -69,28 +69,21 @@ var (
 
 	// WorkerCount is a prometheus metric which holds the number of
 	// concurrent reconciles per controller.
-	WorkerCount = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	WorkerCount = opmetrics.NewPrometheusGauge(Registry, prometheus.GaugeOpts{
 		Name: "controller_runtime_max_concurrent_reconciles",
 		Help: "Maximum number of concurrent reconciles per controller",
 	}, []string{"controller"})
 
 	// ActiveWorkers is a prometheus metric which holds the number
 	// of active workers per controller.
-	ActiveWorkers = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	ActiveWorkers = opmetrics.NewPrometheusGauge(Registry, prometheus.GaugeOpts{
 		Name: "controller_runtime_active_workers",
 		Help: "Number of currently used workers per controller",
 	}, []string{"controller"})
 )
 
 func init() {
-	metrics.Registry.MustRegister(
-		ReconcileTotal,
-		ReconcileErrors,
-		TerminalReconcileErrors,
-		ReconcilePanics,
-		ReconcileTime,
-		WorkerCount,
-		ActiveWorkers,
+	Registry.MustRegister(
 		// expose process metrics like CPU, Memory, file descriptor usage etc.
 		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 		// expose all Go runtime metrics like GC stats, memory stats etc.
