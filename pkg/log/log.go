@@ -43,12 +43,14 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	"k8s.io/klog/v2"
 )
 
 // SetLogger sets a concrete logging implementation for all deferred Loggers.
 func SetLogger(l logr.Logger) {
 	logFullfilled.Store(true)
 	rootLog.Fulfill(l.GetSink())
+	klog.SetLogger(l)
 }
 
 func eventuallyFulfillRoot() {
