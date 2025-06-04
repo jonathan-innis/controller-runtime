@@ -41,8 +41,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/priorityqueue"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
-	ctrlmetrics "sigs.k8s.io/controller-runtime/pkg/internal/controller/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/internal/log"
+	ctrlmetrics "sigs.k8s.io/controller-runtime/pkg/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
